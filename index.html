@@ -1,0 +1,255 @@
+<!-- TEC Canada Program Selector Popover -->
+<!-- Paste this entire block into an Avada Code Element -->
+
+<style>
+.tec-trigger-area{padding:24px;background:#f7f7f7;border:1px solid #e5e5e5;border-radius:8px;text-align:center;font-family:inherit}
+.tec-trigger-label{font-size:14px;color:#666;margin-bottom:12px}
+.tec-btn-trigger{background:#185FA5;color:#fff;border:none;padding:12px 26px;border-radius:6px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit}
+.tec-btn-trigger:hover{background:#0C447C}
+.tec-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:99999;align-items:center;justify-content:center;padding:20px}
+.tec-overlay.open{display:flex}
+.tec-modal{background:#fff;border-radius:10px;width:100%;max-width:540px;padding:28px 30px;position:relative;max-height:90vh;overflow-y:auto;font-family:inherit}
+.tec-modal-close{position:absolute;top:14px;right:18px;background:none;border:none;font-size:20px;cursor:pointer;color:#999;line-height:1;font-family:inherit}
+.tec-modal-close:hover{color:#333}
+.tec-section-label{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#999;margin-bottom:8px}
+.tec-progress-bar{height:3px;background:#e5e5e5;border-radius:2px;margin-bottom:18px;overflow:hidden}
+.tec-progress-fill{height:100%;background:#185FA5;border-radius:2px;transition:width 0.3s ease}
+.tec-q-title{font-size:17px;font-weight:600;color:#111;margin-bottom:4px}
+.tec-q-sub{font-size:13px;color:#777;margin-bottom:16px}
+.tec-options{display:flex;flex-direction:column;gap:8px}
+.tec-opt{background:#f7f7f7;border:1px solid #e5e5e5;border-radius:6px;padding:12px 16px;cursor:pointer;text-align:left;width:100%;font-family:inherit;transition:border-color 0.15s}
+.tec-opt:hover{border-color:#aaa}
+.tec-opt.selected{border:2px solid #185FA5;background:#EDF4FC}
+.tec-opt-title{font-size:14px;font-weight:600;color:#111}
+.tec-opt.selected .tec-opt-title{color:#0C447C}
+.tec-opt-desc{font-size:12px;color:#777;margin-top:3px;line-height:1.45}
+.tec-opt.selected .tec-opt-desc{color:#185FA5}
+.tec-nav-row{display:flex;gap:8px;margin-top:16px;align-items:center}
+.tec-btn-next{background:#185FA5;color:#fff;border:none;padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.tec-btn-next:hover{background:#0C447C}
+.tec-btn-next:disabled{opacity:0.4;cursor:default}
+.tec-btn-back{background:transparent;color:#555;border:1px solid #ccc;padding:10px 16px;border-radius:6px;font-size:14px;cursor:pointer;font-family:inherit}
+.tec-btn-back:hover{background:#f0f0f0}
+.tec-step-count{font-size:12px;color:#aaa;margin-left:auto}
+.tec-result-tag{display:inline-block;background:#EDF4FC;color:#0C447C;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:10px;letter-spacing:0.05em;text-transform:uppercase}
+.tec-result-title{font-size:22px;font-weight:700;color:#111;margin-bottom:4px}
+.tec-result-sub{font-size:13px;color:#777;margin-bottom:14px}
+.tec-result-desc{font-size:14px;color:#333;line-height:1.65;margin-bottom:16px}
+.tec-result-why{background:#f7f7f7;border-radius:6px;padding:14px 16px;margin-bottom:18px}
+.tec-result-why-label{font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px}
+.tec-result-why-item{font-size:13px;color:#555;line-height:1.6;padding-left:12px;border-left:3px solid #185FA5;margin-bottom:6px}
+.tec-result-why-item:last-child{margin-bottom:0}
+.tec-result-cta-row{display:flex;gap:10px;flex-wrap:wrap}
+.tec-btn-primary{background:#185FA5;color:#fff;border:none;padding:11px 20px;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block}
+.tec-btn-primary:hover{background:#0C447C}
+.tec-btn-ghost{background:transparent;color:#333;border:1px solid #ccc;padding:11px 16px;border-radius:6px;font-size:14px;cursor:pointer;font-family:inherit}
+.tec-btn-ghost:hover{background:#f0f0f0}
+.tec-restart-row{margin-top:12px;text-align:center}
+.tec-btn-restart{background:none;border:none;font-size:12px;color:#aaa;cursor:pointer;text-decoration:underline;font-family:inherit}
+.tec-btn-restart:hover{color:#666}
+</style>
+
+<div class="tec-trigger-area">
+  <div class="tec-trigger-label">Not sure which TEC program is right for you?</div>
+  <button class="tec-btn-trigger" onclick="tecOpenModal()">Find my program</button>
+</div>
+
+<div class="tec-overlay" id="tec-overlay" onclick="tecHandleOverlayClick(event)">
+  <div class="tec-modal" id="tec-modal">
+    <button class="tec-modal-close" onclick="tecCloseModal()">&#x2715;</button>
+    <div id="tec-modal-content"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var questions = [
+    {
+      id:'role',
+      label:'Question 1 of 3',
+      title:'How would you describe your current role?',
+      sub:'This helps us match you to the right peer group.',
+      options:[
+        {id:'ceo', title:'CEO, president or owner of a larger business', desc:'You lead an organization with significant revenue, team size, or market presence'},
+        {id:'senior', title:'Senior executive on the path to the top', desc:'VP, COO, CFO or similar — you want to step into the CEO role'},
+        {id:'sme', title:'Owner or leader of a small to mid-size business', desc:'You wear many hats and want to work smarter, not just harder'},
+        {id:'manager', title:'High-potential manager or emerging leader', desc:"You're advancing within an organization and want to grow faster"}
+      ]
+    },
+    {
+      id:'challenge',
+      label:'Question 2 of 3',
+      title:"What's your biggest challenge right now?",
+      sub:'Pick the one that resonates most.',
+      options:[
+        {id:'strategy', title:'Thinking and acting more strategically', desc:'Day-to-day operations keep pulling me away from the big picture'},
+        {id:'decisions', title:'Making better, faster decisions', desc:'I face complex calls and want more confidence and outside perspective'},
+        {id:'growth', title:'Scaling my business or team sustainably', desc:"Growth is happening but I'm not sure I'm building the right foundation"},
+        {id:'leadership', title:'Developing my leadership skills', desc:'I want to become a stronger, more effective leader at every level'}
+      ]
+    },
+    {
+      id:'goal',
+      label:'Question 3 of 3',
+      title:'What does success look like in the next 12 months?',
+      sub:"Be honest — there's no wrong answer.",
+      options:[
+        {id:'scale', title:'Significantly grow my business or team', desc:'Revenue, headcount, market share — I want measurable growth'},
+        {id:'clarity', title:'Lead with more clarity and less stress', desc:'I want to feel confident and in control, not reactive'},
+        {id:'network', title:'Build a powerful peer network I can rely on', desc:'Access to experienced people who understand my world'},
+        {id:'next', title:'Prepare for my next role or level', desc:"I'm building toward something bigger — CEO, board, or beyond"}
+      ]
+    }
+  ];
+
+  var programs = {
+    ceo:{
+      tag:'TEC CEO',
+      title:'Evolve your leadership',
+      sub:'For CEOs, presidents & owners of large enterprises',
+      desc:"You're leading at a level where the decisions are bigger, the stakes are higher, and the loneliness is real. The TEC CEO group connects you with a confidential peer advisory board of non-competing executives who understand exactly where you are — and push you to go further.",
+      why:[
+        'Monthly peer meetings with CEOs and owners at similar scale',
+        '1-to-1 coaching with an accomplished TEC Chair',
+        "Global thought leaders and TEC's exclusive learning platform",
+        'Connection to 45,000+ executives via the EO global network'
+      ],
+      url:'https://tec-canada.com/join-tec/our-executive-programs/tec-ceo/'
+    },
+    senior:{
+      tag:'KEY Executive',
+      title:'Get to the next level',
+      sub:'For senior executives on the path to CEO',
+      desc:"You're talented, driven, and the top role is within reach. The KEY Executive program sharpens the skills that separate great executives from great CEOs — strategic thinking, executive presence, and leading through complexity.",
+      why:[
+        'Peer group of senior executives with shared ambitions',
+        'Development focused on C-suite mindset and skills',
+        'Coaching to identify and close your leadership gaps',
+        'A network of peers who become allies for life'
+      ],
+      url:'https://tec-canada.com/join-tec/our-executive-programs/key-executive/'
+    },
+    sme:{
+      tag:'TEC Small Business',
+      title:'Work on the business, not in it',
+      sub:'For results-driven small business owners',
+      desc:"You're good at what you do — but the business runs you more than you run it. TEC Small Business connects you with peers who face the same reality and hold each other accountable for thinking bigger and building something that lasts.",
+      why:[
+        'Non-competing small business owners who get it',
+        'Practical conversations about real business challenges',
+        'Accountability and perspective on your biggest decisions',
+        'Strategies to build a business that grows without you in every role'
+      ],
+      url:'https://tec-canada.com/join-tec/our-executive-programs/tec-small-business/'
+    },
+    manager:{
+      tag:'TEC Advancing Leaders',
+      title:'Invest in your people',
+      sub:'For high-potential managers and emerging leaders',
+      desc:'Great organizations are built by great leaders at every level. The TEC Advancing Leaders program develops the next generation — enhancing strategic thinking, communication, and collaboration for managers ready to lead beyond their title.',
+      why:[
+        'Structured program for managers and high-potential individuals',
+        'Focus on strategic thinking and cross-functional leadership',
+        'Peer learning alongside others at a similar career stage',
+        'A development path that connects to business goals'
+      ],
+      url:'https://tec-canada.com/join-tec/our-executive-programs/tec-advancing-leaders/'
+    }
+  };
+
+  var roleToProgram = {ceo:'ceo', senior:'senior', sme:'sme', manager:'manager'};
+  var answers = {};
+  var step = 0;
+
+  window.tecOpenModal = function(){
+    answers = {}; step = 0;
+    tecRenderModal();
+    document.getElementById('tec-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.tecCloseModal = function(){
+    document.getElementById('tec-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  };
+
+  window.tecHandleOverlayClick = function(e){
+    if(e.target === document.getElementById('tec-overlay')) tecCloseModal();
+  };
+
+  window.tecSelect = function(qid, oid){
+    answers[qid] = oid;
+    tecRenderModal();
+  };
+
+  window.tecNext = function(){
+    var q = questions[step];
+    if(answers[q.id]){ step++; tecRenderModal(); }
+  };
+
+  window.tecBack = function(){
+    if(step > 0){ step--; tecRenderModal(); }
+  };
+
+  window.tecRestart = function(){
+    answers = {}; step = 0; tecRenderModal();
+  };
+
+  function tecRenderModal(){
+    var c = document.getElementById('tec-modal-content');
+    var html = '';
+
+    if(step < questions.length){
+      var q = questions[step];
+      var sel = answers[q.id];
+      var pct = Math.round((step / questions.length) * 100);
+
+      html += '<div class="tec-section-label">' + q.label + '</div>';
+      html += '<div class="tec-progress-bar"><div class="tec-progress-fill" style="width:' + pct + '%"></div></div>';
+      html += '<div class="tec-q-title">' + q.title + '</div>';
+      html += '<div class="tec-q-sub">' + q.sub + '</div>';
+      html += '<div class="tec-options">';
+      for(var i = 0; i < q.options.length; i++){
+        var o = q.options[i];
+        var cls = sel === o.id ? ' selected' : '';
+        html += '<button class="tec-opt' + cls + '" onclick="tecSelect(\'' + q.id + '\',\'' + o.id + '\')">';
+        html += '<div class="tec-opt-title">' + o.title + '</div>';
+        html += '<div class="tec-opt-desc">' + o.desc + '</div>';
+        html += '</button>';
+      }
+      html += '</div>';
+      html += '<div class="tec-nav-row">';
+      if(step > 0) html += '<button class="tec-btn-back" onclick="tecBack()">Back</button>';
+      html += '<button class="tec-btn-next"' + (sel ? '' : ' disabled') + ' onclick="tecNext()">';
+      html += step === questions.length - 1 ? 'See my recommendation' : 'Next';
+      html += '</button>';
+      html += '<span class="tec-step-count">' + (step+1) + ' / ' + questions.length + '</span>';
+      html += '</div>';
+
+    } else {
+      var prog = roleToProgram[answers.role] || 'ceo';
+      var p = programs[prog];
+
+      html += '<div class="tec-result-tag">Recommended for you</div>';
+      html += '<div class="tec-result-title">' + p.tag + '</div>';
+      html += '<div class="tec-result-sub">' + p.sub + '</div>';
+      html += '<div class="tec-result-desc">' + p.desc + '</div>';
+      html += '<div class="tec-result-why">';
+      html += '<div class="tec-result-why-label">Why this fits you</div>';
+      for(var j = 0; j < p.why.length; j++){
+        html += '<div class="tec-result-why-item">' + p.why[j] + '</div>';
+      }
+      html += '</div>';
+      html += '<div class="tec-result-cta-row">';
+      html += '<a class="tec-btn-primary" href="' + p.url + '">View program details</a>';
+      html += '<a class="tec-btn-ghost" href="https://tec-canada.com/contact/">Talk to an advisor</a>';
+      html += '</div>';
+      html += '<div class="tec-restart-row"><button class="tec-btn-restart" onclick="tecRestart()">Start over</button></div>';
+    }
+
+    c.innerHTML = html;
+    document.getElementById('tec-modal').scrollTop = 0;
+  }
+})();
+</script>
+<!-- End TEC Canada Program Selector -->
